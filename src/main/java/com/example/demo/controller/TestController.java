@@ -10,12 +10,11 @@ import java.util.List;
 @RestController
 public class TestController {
 
-//    @Autowired
-//    GlobalVariable globalVariable;
+    @Autowired
+    GlobalVariable globalVariable;
 
     @GetMapping("/getlist1")
     public List<String> test(){
-//        return globalVariable.list1;
-        return GlobalVariable.list1;
+        return globalVariable.getSrc_type_list();
     }
 }

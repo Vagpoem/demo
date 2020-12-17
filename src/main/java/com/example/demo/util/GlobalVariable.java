@@ -71,4 +71,67 @@ public class GlobalVariable {
     @Value("${charactor.recognition}")
     private String charactor_recognition_url;
 
+    public List<String> getSrc_type_list() {
+        return src_type_list;
+    }
+
+    public List<String> getAuto_src_type_list() {
+        return auto_src_type_list;
+    }
+
+    public List<String> getAppoint_src_type_list() {
+        return appoint_src_type_list;
+    }
+
+    public List<String> getCaptcha_type_list() {
+        return captcha_type_list;
+    }
+
+    public List<String> getCaptcha_type_desc_list() {
+        return captcha_type_desc_list;
+    }
+
+    public List<String> getAi_captcha_type_list() {
+        return ai_captcha_type_list;
+    }
+
+    public List<String> getPerson_captcha_type_list() {
+        return person_captcha_type_list;
+    }
+
+    public List<String> getCaptcha_single_push_list() {
+        return captcha_single_push_list;
+    }
+
+    public List<String> getCaptcha_multi_push_list() {
+        return captcha_multi_push_list;
+    }
+
+    public int getTask_timeout() {
+        return task_timeout;
+    }
+
+    public int getAvailuser_timeout() {
+        return availuser_timeout;
+    }
+
+    public String getPhotoSave_base64_url() {
+        return photoSave_base64_url;
+    }
+
+    public String getPhotoSave_url_url() {
+        return photoSave_url_url;
+    }
+
+    public String getPhotoSave_path() {
+        return photoSave_path;
+    }
+
+    public String getPhotoClassify_api_url() {
+        return photoClassify_api_url;
+    }
+
+    public String getCharactor_recognition_url() {
+        return charactor_recognition_url;
+    }
 }
