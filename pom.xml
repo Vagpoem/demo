@@ -142,7 +142,7 @@
 
 				<!--		配置主类，否则找不到主类		-->
 				<configuration>
-					<mainClass>com.example02.demo02.Demo02Application</mainClass>
+					<mainClass>com.example.demo.DemoApplication</mainClass>
 				</configuration>
 
 			</plugin>

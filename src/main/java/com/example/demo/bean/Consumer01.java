@@ -3,6 +3,8 @@ package com.example.demo.bean;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.example.demo.bean.entity.JobMessage;
+import com.example.demo.service.JobResRedisService;
+import com.example.demo.service.ThreadService;
 import com.google.gson.Gson;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
