@@ -71,6 +71,14 @@ public class GlobalVariable {
     @Value("${charactor.recognition}")
     private String charactor_recognition_url;
 
+    // 第三方打码平台的配置信息
+    @Value("${tujian.url}")
+    private String tujian_url;
+    @Value("${tujian.username}")
+    private String tujian_username;
+    @Value("${tujian.password}")
+    private String tujian_password;
+
     public List<String> getSrc_type_list() {
         return src_type_list;
     }
@@ -133,5 +141,17 @@ public class GlobalVariable {
 
     public String getCharactor_recognition_url() {
         return charactor_recognition_url;
+    }
+
+    public String getTujian_url() {
+        return tujian_url;
+    }
+
+    public String getTujian_username() {
+        return tujian_username;
+    }
+
+    public String getTujian_password() {
+        return tujian_password;
     }
 }
