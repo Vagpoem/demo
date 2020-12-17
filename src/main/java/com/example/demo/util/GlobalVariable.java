@@ -51,4 +51,24 @@ public class GlobalVariable {
     // 空闲用户获取时间设置
     @Value("${availuser.timeout}")
     private int availuser_timeout;
+
+    // base64编码图片保存地址和url图片保存地址
+    @Value("${photoSave.base64}")
+    private String photoSave_base64_url;
+
+    @Value("${photoSave.url}")
+    private String photoSave_url_url;
+
+    // 图片保存的路径
+    @Value("${photoSave.path}")
+    private String photoSave_path;
+
+    // 图片分类RestAPI路径
+    @Value("${photoClassify.api}")
+    private String photoClassify_api_url;
+
+    // 字符型图片自动识别的RestAPI路径
+    @Value("${charactor.recognition}")
+    private String charactor_recognition_url;
+
 }
