@@ -79,6 +79,14 @@ public class GlobalVariable {
     @Value("${tujian.password}")
     private String tujian_password;
 
+    // cookie存活时间配置
+    @Value("${cookie.age}")
+    private int cookie_age;
+
+    // session存活时间配置
+    @Value("${session.age}")
+    private int session_age;
+
     public List<String> getSrc_type_list() {
         return src_type_list;
     }
@@ -153,5 +161,13 @@ public class GlobalVariable {
 
     public String getTujian_password() {
         return tujian_password;
+    }
+
+    public int getCookie_age() {
+        return cookie_age;
+    }
+
+    public int getSession_age() {
+        return session_age;
     }
 }
