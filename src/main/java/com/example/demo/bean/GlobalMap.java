@@ -1,4 +1,4 @@
-package com.example.demo.util;
+package com.example.demo.bean;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;

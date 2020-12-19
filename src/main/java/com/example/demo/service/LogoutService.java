@@ -2,8 +2,8 @@ package com.example.demo.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.entity.User;
-import com.example.demo.util.GlobalMap;
-import com.example.demo.util.GlobalVariable;
+import com.example.demo.bean.GlobalMap;
+import com.example.demo.bean.GlobalVariable;
 import com.example.demo.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
