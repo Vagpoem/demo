@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -9,6 +10,7 @@ import org.springframework.web.filter.CorsFilter;
 /**
  * 配置请求方式
  */
+@EnableAutoConfiguration
 @Configuration
 public class CorsConfig {
     private CorsConfiguration corsConfig() {

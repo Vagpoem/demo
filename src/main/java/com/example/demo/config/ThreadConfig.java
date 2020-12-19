@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -12,6 +13,7 @@ import java.util.concurrent.Executor;
 /**
  * 多线程（线程池）配置类
  */
+@EnableAutoConfiguration
 @Configuration
 @ComponentScan("com.example.demo.service")
 @EnableAsync
