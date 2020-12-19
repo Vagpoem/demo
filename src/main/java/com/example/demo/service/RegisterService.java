@@ -88,7 +88,9 @@ public class RegisterService {
                 session.setAttribute("user", user);
                 Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
                 Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
+                Util.addCookie("user_id", user.getUser_id()+"", response, globalVariable.getCookie_age());
                 globalMap.setUsernameSession(user.getUser_name(), session);
+                globalMap.setUseridSession(user.getUser_id()+"", session);
 
                 message += "登录成功！";
             }

@@ -54,7 +54,7 @@ public class LoginService {
                 message += "无用户信息！";
             } else {
                 // 4.查看该用户名对应的用户是否已经登录
-                if (ObjectUtils.isEmpty(globalMap.getSession(user.getUser_name()))){
+                if (ObjectUtils.isEmpty(globalMap.getSessionFromUsername(user.getUser_name()))){
                     message += "用户已登录，请勿重复登录！";
                 } else {
                     // 5.如果有该条用户的信息则比对密码信息
@@ -67,7 +67,9 @@ public class LoginService {
                         session.setAttribute("user", user);
                         Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
                         Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
+                        Util.addCookie("user_id", user.getUser_id()+"", response, globalVariable.getCookie_age());
                         globalMap.setUsernameSession(user.getUser_name(), session);
+                        globalMap.setUseridSession(user.getUser_id()+"", session);
 
                         // 修改返回信息中的状态码和状态信息
                         res.put("data", judgeUser);
