@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -70,17 +71,27 @@ public class RegisterService {
                 return res;
             }
 
-            // 3.进行登录状态的维护：
-            //  3.1将用户的信息作为一个session对象存在session中；
-            //  3.2将用户的sessionid以及user_name传递给浏览器端的cookie；
-            //  3.3将用户名和session做一个映射。
-            HttpSession session = request.getSession();
-            session.setMaxInactiveInterval(globalVariable.getSession_age());
-            String sessionid = session.getId();
-            session.setAttribute("user", user);
-            Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
-            Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
-            globalMap.setUsernameSession(user.getUser_name(), session);
+            // 3.对浏览器的cookie信息进行查看查询是否已登录其他用户
+            Cookie[] cookies = request.getCookies();
+            if (Util.hasCookie("user_name", cookies)){
+                status = 500;
+                message += "登录失败！请换一个浏览器登录！";
+            } else {
+                // 4.进行登录状态的维护：
+                // TODO:将用户的准确率、速度、得分、异常率、疲劳度的信息存入到session的属性信息中
+                //  4.1将用户的信息作为一个session对象存在session中；
+                //  4.2将用户的sessionid以及user_name传递给浏览器端的cookie；
+                //  4.3将用户名和session做一个映射。
+                HttpSession session = request.getSession();
+                session.setMaxInactiveInterval(globalVariable.getSession_age());
+                String sessionid = session.getId();
+                session.setAttribute("user", user);
+                Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
+                Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
+                globalMap.setUsernameSession(user.getUser_name(), session);
+
+                message += "登录成功！";
+            }
 
             // TODO:4.将用户的信息放入到redis中以备下次登录使用？
         }
