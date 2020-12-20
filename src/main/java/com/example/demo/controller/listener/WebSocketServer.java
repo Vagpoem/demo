@@ -3,9 +3,10 @@ package com.example.demo.controller.listener;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.bean.GlobalMap;
+import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.entity.User;
 import com.example.demo.service.AvaiUserListService;
-import com.example.demo.service.JobResRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -22,16 +23,15 @@ public class WebSocketServer {
 
     private static Log log = LogFactory.get(WebSocketServer.class);
 
-    private static UserRedisService userRedisService;
     private static AvaiUserListService avaiUserListService;
-    private static JobResRedisService jobResRedisService;
+    private static GlobalMap globalMap;
+    private static GlobalVariable globalVariable;
 
     @Autowired
-    public void setPrivateVar(UserRedisService userRedisService, AvaiUserListService avaiUserListService,
-                              JobResRedisService jobResRedisService){
-        WebSocketServer.userRedisService = userRedisService;
+    public void setPrivateVar(AvaiUserListService avaiUserListService, GlobalMap globalMap, GlobalVariable globalVariable){
         WebSocketServer.avaiUserListService = avaiUserListService;
-        WebSocketServer.jobResRedisService = jobResRedisService;
+        WebSocketServer.globalMap = globalMap;
+        WebSocketServer.globalVariable = globalVariable;
     }
 
     /**静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。*/
@@ -42,6 +42,8 @@ public class WebSocketServer {
     private Session session;
     /**接收userId*/
     private String userId="";
+    /**接收jobId*/
+    private String jobId="";
 
     @OnOpen
     public void onOpen(Session session, @PathParam("userId") String userId){
@@ -59,14 +61,10 @@ public class WebSocketServer {
         }
 
         // 2.将用户加入到空闲用户列表中
+        avaiUserListService.addUser((User) globalMap.getSessionFromUserid(userId).getAttribute("user"));
 
         // 3.登录状态会话状态维护
-
-
-        avaiUserListService.addUserToRedisList(userRedisService.getUserFromRedis(userId));
-
-        // 会话状态维护
-        boolean flag = MySessionMap.sessionMaintain(userId);
+        globalMap.getSessionFromUserid(userId).setMaxInactiveInterval(globalVariable.getSession_age());
 
         log.info("用户连接:"+userId+",当前在线人数为:" + getOnlineCount());
     }
@@ -74,71 +72,35 @@ public class WebSocketServer {
     @OnClose
     public void onClose(){
 
-        // 1.将websocket从集合中删除
-
-        // 2.将用户从空闲用户列表中删除
-
-        // 3.登录状态会话维护
-
         if (webSocketMap.containsKey(userId)){
+            // 1.将websocket从集合中删除
             webSocketMap.remove(userId);
 
-            User user = null;
+            // 2.将用户从空闲用户列表中删除
+            avaiUserListService.delUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"));
 
-            if (ObjectUtils.isEmpty(userRedisService)){
-                log.warn("userRedisService对象获取失败！");
-            } else {
-                log.warn("userRedisService对象获取成功！");
-                user = userRedisService.getUserFromRedis(userId);
-                log.info("获取对象为："+user);
-            }
+            // 3.登录状态会话状态维护
+            globalMap.getSessionFromUserid(userId).setMaxInactiveInterval(globalVariable.getSession_age());
 
-            // 认定为放弃任务将信息放入任务结果缓存区中，从用户可用列表中删除并从set中删除
-            if (ObjectUtils.isEmpty(avaiUserListService)){
-                log.warn("avaiUserListService对象获取失败！");
-            } else {
-                log.warn("avaiUserListService对象获取成功！");
-                if (!ObjectUtils.isEmpty(user)){
-                    avaiUserListService.deleteUserFromRedisList(user);
-                    log.warn("删除成功！！！！");
-                }
-            }
-
-            // 在线人数减一
+            // 4.在线人数减一
             subOnlineCount();
-
         }
-
-        // 会话状态维护
-        boolean flag = MySessionMap.sessionMaintain(userId);
-
     }
 
     @OnMessage
     public void onMessage(String message, Session session){
 
-        // 1.接受任务的结果
+        // 1.将结果保存
+        globalMap.setJobidResult(jobId, message);
 
-        // 2.将结果保存
+        // 2.将用户加入到空闲用户列表中
+        avaiUserListService.addUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"));
 
-        // 3.将用户加入到空闲用户列表中
+        // 3.将本对象的jobId置为空
+        setJobId("");
 
         // 4.登录状态会话维护
-
-        // 先通过用户id和任务id的映射获取任务id，再将收到的消息放入到任务结果返回区中
-        log.info("接收到来自id为 "+userId+" 的用户消息："+message);
-        String jobId = jobResRedisService.getJobId(userId);
-        try {
-            jobResRedisService.setRes(jobId, message);
-            log.info("已将用户返回的结果存储至缓存区中！");
-        } catch (Exception e) {
-            log.error("结果缓存出错");
-            jobResRedisService.setRes(jobId, "系统出错");
-        }
-        avaiUserListService.addUserToRedisList(userRedisService.getUserFromRedis(userId));
-
-        // 会话状态维护
-        boolean flag = MySessionMap.sessionMaintain(userId);
+        globalMap.getSessionFromUserid(userId).setMaxInactiveInterval(globalVariable.getSession_age());
 
     }
 
@@ -151,12 +113,14 @@ public class WebSocketServer {
         this.session.getBasicRemote().sendText(message);
     }
 
-    public static boolean sendInfo(JSONObject message, @PathParam("userId") String userId) throws IOException{
+    public static boolean sendInfo(JSONObject message, @PathParam("userId") String userId,
+                                   @PathParam("jobId") String jobId) throws IOException{
 
         // 将任务发送给相应的客户端
         log.info("发送消息到:"+userId+"，报文:"+message);
         if (!userId.isEmpty() && webSocketMap.containsKey(userId)){
             webSocketMap.get(userId).sendMessage(message.toString());
+            webSocketMap.get(userId).setJobId(jobId);
             log.info("返回请求客户端消息 " + message + "给用户 " + userId);
             return true;
         } else {
@@ -179,5 +143,13 @@ public class WebSocketServer {
 
     public static synchronized void subOnlineCount() {
         WebSocketServer.onlineCount--;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 }

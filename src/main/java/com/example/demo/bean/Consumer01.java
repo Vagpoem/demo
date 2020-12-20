@@ -3,7 +3,6 @@ package com.example.demo.bean;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.example.demo.bean.entity.JobMessage;
-import com.example.demo.service.JobResRedisService;
 import com.example.demo.service.ThreadService;
 import com.google.gson.Gson;
 import org.springframework.amqp.core.Message;
@@ -24,9 +23,8 @@ public class Consumer01 {
 
     @Autowired
     private ThreadService threadService;
-
     @Autowired
-    private JobResRedisService jobResRedisService;
+    GlobalMap globalMap;
 
     /**
      * 消费者消费消息的方法
@@ -50,7 +48,7 @@ public class Consumer01 {
         } catch (Exception e) {
             // 如果出错往任务结果返回区内返回出错信息
             log.error("新开线程出错！");
-            jobResRedisService.setRes(jobMessage.getJob_id(), "系统出错");
+            globalMap.setJobidResult(jobMessage.getJob_id(), "系统出错");
         }
 
     }

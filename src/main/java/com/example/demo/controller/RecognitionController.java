@@ -8,9 +8,8 @@ import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.Producer01;
 import com.example.demo.bean.entity.Job;
 import com.example.demo.bean.entity.JobMessage;
-import com.example.demo.service.ClassifyService;
-import com.example.demo.service.ImgSaveService;
-import com.example.demo.service.VerificationService;
+import com.example.demo.mapper.JobMapper;
+import com.example.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,6 +35,12 @@ public class RecognitionController {
     ClassifyService classifyService;
     @Autowired
     Producer01 producer01;
+    @Autowired
+    GetJobResService getJobResService;
+    @Autowired
+    VoteService voteService;
+    @Autowired
+    JobMapper jobMapper;
 
     @PostMapping("/recognition")
     public JSONObject recognition(@RequestBody JSONObject params, @RequestHeader("token") String token) throws InterruptedException{
@@ -62,19 +68,26 @@ public class RecognitionController {
 
             // 4.将保存的图片进行分类
             classMessage = classifyService.classify(globalVariable.getPhotoSave_path());
+            newJob.setSubtype_id(classMessage);
 
             // 5.发送到消息队列中
             JobMessage jobMessage = new JobMessage(tempJobId, params.getString("src_type"), params.getString("data"), classMessage);
-            producer01.produce(jobMessage);
+            if (!producer01.produce(jobMessage)){
+                message += "消息队列出错!";
+            } else {
+                int contrl1 = 0, control2 = 0;
+                // 6.是否接受任务
 
-            // 6.开始等待任务的结果
-            bypass_result =
+                // 7.开始等待任务的结果
+                List<String> tempRes = getJobResService.getRes(tempJobId);
 
+                // 8.结果投票
+                bypass_result = voteService.voteResult(tempRes);
+
+                // TODO:9.换人分发？
+
+            }
         }
-
-        // 7.结果查询（投票？）
-        // TODO:8.换人分发？
-
         res.put("status", status);
         res.put("message", message);
         res.put("class", classMessage);

@@ -3,8 +3,11 @@ package com.example.demo.bean.entity;
 public class UserInfo {
 
     private String userid;
+    // 用户的准确率
     private int accuracy;
+    // 用户的平均速度
     private int speed;
+    // 用户的
     private int accu_score;
     private int exception_rate;
     private int fatigue;

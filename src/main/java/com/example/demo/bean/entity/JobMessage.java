@@ -13,6 +13,16 @@ public class JobMessage {
     private String data;
     // 验证码分类的结果
     private String jobType;
+    // 图片保存后的地址
+    private String path;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public String getJobType() {
         return jobType;

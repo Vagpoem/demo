@@ -32,6 +32,10 @@ public class GlobalVariable {
     @Value("#{'${captcha.ai.type}'.split(',')}")
     private List<String> ai_captcha_type_list;
 
+    // 分配给AI的验证码类型对应的ai的id
+    @Value("#{'${captcha.ai.id}'.split(',')}")
+    private List<String> ai_captcha_id_list;
+
     // 分配给人的验证码类型列表
     @Value("#{'${captcha.person.type}'.split(',')}")
     private List<String> person_captcha_type_list;
@@ -86,6 +90,10 @@ public class GlobalVariable {
     // session存活时间配置
     @Value("${session.age}")
     private int session_age;
+
+    public List<String> getAi_captcha_id_list() {
+        return ai_captcha_id_list;
+    }
 
     public List<String> getSrc_type_list() {
         return src_type_list;

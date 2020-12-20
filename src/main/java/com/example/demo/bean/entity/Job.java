@@ -7,17 +7,19 @@ import java.sql.Timestamp;
  */
 public class Job {
 
-    //数据库中job表的各个字段
+    // 数据库中job表的各个字段
     private String job_id;
     private String job_name;
     private String requester_id;
     private String receiver_id;
+    // 任务当前的状态：“0”任务生成还未开始，“1”代表已接受但是未完成（异常），“2”代表成功完成
     private String job_status;
     private Timestamp request_time;
     private Timestamp receive_time;
     private Timestamp finish_time;
     private String captcha_src;
     private String captcha_result;
+    // 任务的反馈情况：“0”代表未达到预期，“1”代表达到预期
     private String response_code;
     private String subtype_id;
 

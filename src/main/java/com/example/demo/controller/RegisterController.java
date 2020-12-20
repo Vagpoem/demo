@@ -24,9 +24,6 @@ public class RegisterController {
     private RegisterService registerService;
 
     @Autowired
-    private UserRedisService userRedisService;
-
-    @Autowired
     private GlobalVariable globalVariable;
 
     // 注册接口

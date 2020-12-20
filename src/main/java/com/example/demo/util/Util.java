@@ -2,6 +2,7 @@ package com.example.demo.util;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 public class Util {
 
@@ -34,6 +35,21 @@ public class Util {
             }
         }
         return res;
+    }
+
+    /**
+     * 查看一个列表中是否含有某个元素值
+     * @param list
+     * @param key
+     * @return
+     */
+    public static boolean hasElement(List<String> list, String key){
+        boolean flag = false;
+        for (String ele : list){
+            if (ele.equals(key))
+                return true;
+        }
+        return flag;
     }
 
 }

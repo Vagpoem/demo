@@ -16,9 +16,6 @@ public class LogoutController {
     private Log log = LogFactory.get(LoginController.class);
 
     @Autowired
-    private UserRedisService userRedisService;
-
-    @Autowired
     private LogoutService logoutService;
 
     @GetMapping("/logout")
