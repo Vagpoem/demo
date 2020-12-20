@@ -3,9 +3,9 @@ package com.example.demo.controller.listener;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.bean.entity.User;
 import com.example.demo.service.AvaiUserListService;
 import com.example.demo.service.JobResRedisService;
-import com.example.demo.service.UserRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -47,8 +47,6 @@ public class WebSocketServer {
     public void onOpen(Session session, @PathParam("userId") String userId){
 
         // 1.将websocket加入到集合中
-        // 2.将用户加入到空闲用户列表中
-        // 3.会话状态维护
         this.session = session;
         this.userId = userId;
         if (webSocketMap.containsKey(userId)){
@@ -59,6 +57,12 @@ public class WebSocketServer {
             webSocketMap.put(userId, this);
             addOnlineCount();
         }
+
+        // 2.将用户加入到空闲用户列表中
+
+        // 3.登录状态会话状态维护
+
+
         avaiUserListService.addUserToRedisList(userRedisService.getUserFromRedis(userId));
 
         // 会话状态维护
@@ -69,6 +73,13 @@ public class WebSocketServer {
 
     @OnClose
     public void onClose(){
+
+        // 1.将websocket从集合中删除
+
+        // 2.将用户从空闲用户列表中删除
+
+        // 3.登录状态会话维护
+
         if (webSocketMap.containsKey(userId)){
             webSocketMap.remove(userId);
 
@@ -105,6 +116,15 @@ public class WebSocketServer {
 
     @OnMessage
     public void onMessage(String message, Session session){
+
+        // 1.接受任务的结果
+
+        // 2.将结果保存
+
+        // 3.将用户加入到空闲用户列表中
+
+        // 4.登录状态会话维护
+
         // 先通过用户id和任务id的映射获取任务id，再将收到的消息放入到任务结果返回区中
         log.info("接收到来自id为 "+userId+" 的用户消息："+message);
         String jobId = jobResRedisService.getJobId(userId);
@@ -132,6 +152,8 @@ public class WebSocketServer {
     }
 
     public static boolean sendInfo(JSONObject message, @PathParam("userId") String userId) throws IOException{
+
+        // 将任务发送给相应的客户端
         log.info("发送消息到:"+userId+"，报文:"+message);
         if (!userId.isEmpty() && webSocketMap.containsKey(userId)){
             webSocketMap.get(userId).sendMessage(message.toString());

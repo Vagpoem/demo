@@ -56,4 +56,12 @@ public interface UserMapper {
     @Select("select * from user where hasPhone='1' order by mark")
     public List<User> selectHasPhoneUser();
 
+    /**
+     * 获取用户的token信息
+     * @param user_id 用户的id
+     * @return 用户的token
+     */
+    @Select("select token from user where user_id=#{user_id}")
+    public String selectToken(@Param("user_id") String user_id);
+
 }

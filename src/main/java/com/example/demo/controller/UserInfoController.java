@@ -24,4 +24,12 @@ public class UserInfoController {
         return userMapper.selectUser(id);
     }
 
+    @GetMapping("/usertoken/{id}")
+    public String getToken(@PathVariable Integer id){
+
+        // 获取用户的token信息
+        return userMapper.selectToken(id+"");
+
+    }
+
 }

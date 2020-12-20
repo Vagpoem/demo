@@ -5,7 +5,6 @@ import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.entity.User;
 import com.example.demo.service.RegisterService;
-import com.example.demo.service.UserRedisService;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;

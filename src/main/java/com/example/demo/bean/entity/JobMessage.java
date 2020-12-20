@@ -9,9 +9,9 @@ public class JobMessage {
     private String job_id;
     // 任务对应的类型
     private String type;
-    // 任务对应的数据（可以是base64编码、图片链接和验证码链接三者之一）
+    // 任务对应的数据（可以是base64编码、图片链接和验证码链接或是手机号码四者之一）
     private String data;
-    // 验证码的类型
+    // 验证码分类的结果
     private String jobType;
 
     public String getJobType() {
