@@ -7,13 +7,13 @@ import com.example.demo.bean.entity.User;
 import com.example.demo.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @RestController
 public class LoginController {
@@ -23,6 +23,7 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+    @CrossOrigin
     @PostMapping("/login")
     public JSONObject login(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject params){
 

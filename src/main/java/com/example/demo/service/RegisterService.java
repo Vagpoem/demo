@@ -73,7 +73,8 @@ public class RegisterService {
 
             // 3.对浏览器的cookie信息进行查看查询是否已登录其他用户
             Cookie[] cookies = request.getCookies();
-            if (Util.hasCookie("user_name", cookies)){
+            if (Util.hasCookie("user_name", cookies)&&
+                    !ObjectUtils.isEmpty(globalMap.getSessionFromUsername(Util.getCookieValue("user_name", cookies)))){
                 status = 500;
                 message += "登录失败！请换一个浏览器登录！";
             } else {
@@ -86,9 +87,6 @@ public class RegisterService {
                 session.setMaxInactiveInterval(globalVariable.getSession_age());
                 String sessionid = session.getId();
                 session.setAttribute("user", user);
-                Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
-                Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
-                Util.addCookie("user_id", user.getUser_id()+"", response, globalVariable.getCookie_age());
                 globalMap.setUsernameSession(user.getUser_name(), session);
                 globalMap.setUseridSession(user.getUser_id()+"", session);
 

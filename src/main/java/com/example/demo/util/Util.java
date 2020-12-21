@@ -1,5 +1,7 @@
 package com.example.demo.util;
 
+import org.springframework.util.ObjectUtils;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -16,6 +18,7 @@ public class Util {
     public static void addCookie(String name, String value, HttpServletResponse response, int time){
         Cookie cookie = new Cookie(name, value);
         cookie.setMaxAge(time);
+        cookie.setPath("/");
         response.addCookie(cookie);
     }
 
@@ -28,10 +31,24 @@ public class Util {
     public static boolean hasCookie(String name, Cookie[] cookies){
         boolean res = false;
         // 遍历cookie数组
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(name)){
-                res = true;
-                break;
+        if (!ObjectUtils.isEmpty(cookies)){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(name)){
+                    res = true;
+                    break;
+                }
+            }
+        }
+        return res;
+    }
+    public static String getCookieValue(String name, Cookie[] cookies){
+        String res = null;
+        // 遍历cookie数组
+        if (!ObjectUtils.isEmpty(cookies)){
+            for (Cookie cookie : cookies){
+                if (cookie.getName().equals(name)){
+                    res = cookie.getValue();
+                }
             }
         }
         return res;

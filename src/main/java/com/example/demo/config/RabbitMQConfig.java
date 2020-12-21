@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * 可以配置相应的队列、交换机和绑定。
  */
 @Configuration
+@EnableAutoConfiguration
 public class RabbitMQConfig {
 
     // 创建一个任务消息队列，消息队列的名称为：jobMessage_queue_01

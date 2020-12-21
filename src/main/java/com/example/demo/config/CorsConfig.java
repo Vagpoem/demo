@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * 配置请求方式
@@ -13,6 +15,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableAutoConfiguration
 @Configuration
 public class CorsConfig {
+
     private CorsConfiguration corsConfig() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         // 请求常用的三种配置，*代表允许所有，也可以自定义属性（比如 header 只能带什么，只能是 post 方式等）
@@ -30,4 +33,5 @@ public class CorsConfig {
         source.registerCorsConfiguration("/**", corsConfig());
         return new CorsFilter(source);
     }
+
 }

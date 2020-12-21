@@ -46,7 +46,9 @@ public class LoginService {
 
         // 2.判断浏览器是已经有账号登录
         Cookie[] cookies = request.getCookies();
-        if (Util.hasCookie("user_name", cookies)){
+
+        if (Util.hasCookie("user_name", cookies)&&
+                !ObjectUtils.isEmpty(globalMap.getSessionFromUsername(Util.getCookieValue("user_name", cookies)))){
             message += "该浏览器已有用户登录，请换一个浏览器登录";
         } else {
             if (ObjectUtils.isEmpty(judgeUser)) {
@@ -54,22 +56,28 @@ public class LoginService {
                 message += "无用户信息！";
             } else {
                 // 4.查看该用户名对应的用户是否已经登录
-                if (ObjectUtils.isEmpty(globalMap.getSessionFromUsername(user.getUser_name()))){
+                if (!ObjectUtils.isEmpty(globalMap.getSessionFromUsername(user.getUser_name()))){
                     message += "用户已登录，请勿重复登录！";
                 } else {
                     // 5.如果有该条用户的信息则比对密码信息
                     if (judgeUser.getPassword().equals(user.getPassword())){
                         // 4.如果密码比对成功则进行登录状态维护
                         // TODO:将用户的准确率、速度、得分、异常率、疲劳度的信息存入到session的属性信息中
+                        log.info("开始登录......");
                         HttpSession session = request.getSession();
                         session.setMaxInactiveInterval(globalVariable.getSession_age());
                         String sessionid = session.getId();
-                        session.setAttribute("user", user);
+                        session.setAttribute("user", judgeUser);
+                        log.info("session信息设置完毕......");
                         Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
                         Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
                         Util.addCookie("user_id", user.getUser_id()+"", response, globalVariable.getCookie_age());
+                        log.info("cookie信息设置完毕......");
                         globalMap.setUsernameSession(user.getUser_name(), session);
-                        globalMap.setUseridSession(user.getUser_id()+"", session);
+                        globalMap.setUseridSession(judgeUser.getUser_id()+"", session);
+                        log.info("全局映射设置完毕......");
+                        log.info("usernameSession的大小为："+globalMap.username_Session.size()+
+                                "  useridSession的大小为："+globalMap.userid_Session.size());
 
                         // 修改返回信息中的状态码和状态信息
                         res.put("data", judgeUser);

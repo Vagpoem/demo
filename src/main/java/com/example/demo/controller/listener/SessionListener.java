@@ -2,6 +2,12 @@ package com.example.demo.controller.listener;
 
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import com.example.demo.bean.GlobalMap;
+import com.example.demo.bean.GlobalVariable;
+import com.example.demo.bean.SpringJobBeanFactory;
+import com.example.demo.bean.entity.User;
+import com.example.demo.service.AvaiUserListService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 
 import javax.servlet.ServletContext;
@@ -54,10 +60,19 @@ public class SessionListener implements HttpSessionListener, HttpSessionAttribut
         log.warn("-----sessionDestroyed-----");
         HttpSession session = event.getSession();
 
-        // 2.销毁会话对象映射
+        // 2.消除session和用户信息之间的映射
+        User user = (User) session.getAttribute("user");
+        session.removeAttribute("user");
+        log.info("被删除session的用户信息为："+user);
+        GlobalMap globalMap = SpringJobBeanFactory.getBean("globalMap");
+        log.info("globalMap的信息为："+globalMap);
+        globalMap.delSessionFromUserid(user.getUser_id()+"");
+        globalMap.delSessionFromUsername(user.getUser_name());
+
+        // 3.销毁会话对象映射
         ServletContext application = session.getServletContext();
         HashSet<?> sessions = (HashSet<?>) application.getAttribute("sessions");
-        // 3.销毁的session均从HashSet集中移除
+        // 4.销毁的session均从HashSet集中移除
         sessions.remove(session);
 
         log.info("session注销完成！！！");

@@ -92,6 +92,7 @@ public class RecognitionController {
                 if (ObjectUtils.isEmpty(list)){
                     message += "短期内没有空闲打码客户端";
                 } else {
+                    newJob.setReceive_time(new Timestamp(System.currentTimeMillis()));
                     // 7.开始等待任务的结果
                     List<String> tempRes = null;
 

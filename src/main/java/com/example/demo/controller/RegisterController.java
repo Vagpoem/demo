@@ -8,6 +8,7 @@ import com.example.demo.service.RegisterService;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +28,7 @@ public class RegisterController {
     private GlobalVariable globalVariable;
 
     // 注册接口
+    @CrossOrigin
     @PostMapping("/register")
     public JSONObject register(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject formData){
 

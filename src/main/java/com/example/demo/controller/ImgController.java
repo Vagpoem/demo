@@ -18,10 +18,10 @@ public class ImgController {
     @Autowired
     GlobalVariable globalVariable;
 
-    private String filePath = globalVariable.getPhotoSave_path();
-
+    @CrossOrigin
     @PostMapping("/image/upload")
     public JSONObject upLoad(@RequestParam("upload")MultipartFile upload, @RequestParam("user_id") String userId){
+        String filePath = globalVariable.getPhotoSave_path();
         JSONObject res = new JSONObject();
 
         //判断文件夹是否存在,不存在则创建
