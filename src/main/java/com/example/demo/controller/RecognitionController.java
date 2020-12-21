@@ -4,13 +4,16 @@ package com.example.demo.controller;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.Producer01;
 import com.example.demo.bean.entity.Job;
 import com.example.demo.bean.entity.JobMessage;
+import com.example.demo.bean.entity.User;
 import com.example.demo.mapper.JobMapper;
 import com.example.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -41,6 +44,8 @@ public class RecognitionController {
     VoteService voteService;
     @Autowired
     JobMapper jobMapper;
+    @Autowired
+    GlobalMap globalMap;
 
     @PostMapping("/recognition")
     public JSONObject recognition(@RequestBody JSONObject params, @RequestHeader("token") String token) throws InterruptedException{
@@ -77,15 +82,33 @@ public class RecognitionController {
             } else {
                 int contrl1 = 0, control2 = 0;
                 // 6.是否接受任务
+                List<User> list = null;
+                while (ObjectUtils.isEmpty(list)&&contrl1<globalVariable.getAvailuser_timeout()){
+                    list = globalMap.getJobidReceiver(tempJobId);
+                    contrl1++;
+                    Thread.sleep(1000);
+                }
 
-                // 7.开始等待任务的结果
-                List<String> tempRes = getJobResService.getRes(tempJobId);
+                if (ObjectUtils.isEmpty(list)){
+                    message += "短期内没有空闲打码客户端";
+                } else {
+                    // 7.开始等待任务的结果
+                    List<String> tempRes = null;
 
-                // 8.结果投票
-                bypass_result = voteService.voteResult(tempRes);
+                    while (tempRes.size()!=list.size()&&control2<globalVariable.getTask_timeout()){
+                        tempRes = getJobResService.getRes(tempJobId);
+                        control2++;
+                        Thread.sleep(1000);
+                    }
 
+                    if (ObjectUtils.isEmpty(tempRes)){
+                        message += "打码端超时！";
+                    } else {
+                        // 8.结果投票
+                        bypass_result = voteService.voteResult(tempRes);
+                    }
+                }
                 // TODO:9.换人分发？
-
             }
         }
         res.put("status", status);

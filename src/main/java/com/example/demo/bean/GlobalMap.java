@@ -97,9 +97,10 @@ public class GlobalMap {
         }
     }
 
-    // 任务id和任务结果的映射表
+
+    // 任务id和任务接受者的映射表
     private Map<String, List<User>> jobReceiver = new HashMap<>();
-    // 向任务id和结果的映射表中添加元素
+    // 向任务id和接受者的映射表中添加元素
     public boolean setJobidReceiver(String job_id, User user){
         boolean flag = false;
         if (jobReceiver.containsKey(job_id)){
@@ -113,7 +114,7 @@ public class GlobalMap {
         }
         return flag;
     }
-    // 从任务id和结果的映射表中获取元素
+    // 从任务id和接收者的映射表中获取元素
     public List<User> getJobidReceiver(String job_id){
         List<User> list = null;
         if (jobReceiver.containsKey(job_id)){
@@ -121,7 +122,7 @@ public class GlobalMap {
         }
         return list;
     }
-    // 从任务id和结果的映射表中删除元素
+    // 从任务id和接受者的映射表中删除元素
     public void delJobidReceiver(String job_id){
         if (jobReceiver.containsKey(job_id)){
             jobReceiver.remove(job_id);

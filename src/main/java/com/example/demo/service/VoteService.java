@@ -10,7 +10,7 @@ public class VoteService {
     public String voteResult(List<String> list){
         String res = "";
 
-
+        res = list.get(0);
 
         return res;
     }
