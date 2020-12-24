@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
@@ -18,10 +20,14 @@ import java.util.List;
 @Service
 public class PushService {
 
+    private Log log = LogFactory.get(PushService.class);
+
     @Autowired
     HttpRequest httpRequest;
     @Autowired
     GlobalMap globalMap;
+    @Autowired
+    GlobalVariable globalVariable;
 
     public boolean pushImgToClient(JobMessage jobMessage, List<User> list) throws IOException {
         boolean res = false;
@@ -38,6 +44,8 @@ public class PushService {
                 // 2.通过websocket推送个人工打码客户端
                 WebSocketServer.sendInfo(msg, user.getUser_id()+"", jobMessage.getJob_id());
 
+                log.info("推送给人工打码客户端！");
+
                 res = true;
             }
             if (user.getRole().equals("第三方打码平台")){
@@ -46,17 +54,23 @@ public class PushService {
                 res = false;
             }
             if (user.getRole().equals("AI打码客户端")){
+
+                log.info("推送给AI打码客户端！");
+
                 // 1.构造数据对象
                 JSONObject object = new JSONObject();
                 object.put("path", jobMessage.getPath());
 
                 // 2.发送post对象
-                JSONObject isAI = httpRequest.getRes(user.getMail(), object);
+                JSONObject isAI = httpRequest.getRes(globalVariable.getCharactor_recognition_url(), object);
 
                 // 3.返回结果
                 if (!ObjectUtils.isEmpty(isAI)){
                     if (isAI.getString("status").equals("200")){
+                        //log.info("AI识别的结果为："+isAI.getString("value"));
                         globalMap.setJobidResult(jobMessage.getJob_id(), isAI.getString("value"));
+                        log.info(jobMessage.getJob_id()+"   AI识别的结果为："+isAI.getString("value"));
+                        log.info("任务结果和id映射完成："+globalMap.jobResult.size());
                     }else {
                         globalMap.setJobidResult(jobMessage.getJob_id(), "系统出错");
                     }

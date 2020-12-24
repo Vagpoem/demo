@@ -85,6 +85,7 @@ public class GlobalMap {
         } else {
             List<String> list = new ArrayList<>();
             list.add(result);
+            jobResult.put(job_id, list);
             flag = true;
         }
         return flag;
@@ -117,6 +118,7 @@ public class GlobalMap {
         } else {
             List<User> list = new ArrayList<>();
             list.add(user);
+            jobReceiver.put(job_id, list);
             flag = true;
         }
         return flag;

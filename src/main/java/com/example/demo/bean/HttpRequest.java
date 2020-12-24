@@ -29,8 +29,6 @@ public class HttpRequest {
             res = null;
         }
 
-        System.out.println(res);
-
         return res;
     }
 }

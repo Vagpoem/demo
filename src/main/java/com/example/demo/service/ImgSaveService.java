@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.HttpRequest;
@@ -12,6 +14,8 @@ import org.springframework.util.ObjectUtils;
 
 @Service
 public class ImgSaveService {
+
+    private Log log = LogFactory.get(ImgSaveService.class);
 
     @Autowired
     GlobalVariable globalVariable;
@@ -38,13 +42,16 @@ public class ImgSaveService {
 
     // 用于保存base64数据的方法
     private boolean base64Save(String base64, String path){
+
+        log.info("base64编码为："+base64);
+
         boolean flag = false;
 
         // 1.先将base64编码转换为合适的格式
         String tempbase64 = base64;
         int end = base64.indexOf(",");
         if (end>0){
-            tempbase64 = tempbase64.substring(end + 1);
+            tempbase64 = base64.substring(end + 1);
         }
 
         // 2.构造base64数据保存对象

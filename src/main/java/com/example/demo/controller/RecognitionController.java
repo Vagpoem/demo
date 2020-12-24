@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,28 +69,40 @@ public class RecognitionController {
             newJob.setJob_status("0");
             newJob.setJob_name(" ");
 
+            log.info("图片保存路径为："+globalVariable.getPhotoSave_path());
+
             // 3.将传入的验证码数据保存为图片
             // TODO:数据保存出错不需要处理？继续打码任务？
             if (!imgSaveService.save(params, globalVariable.getPhotoSave_path() + tempJobId + ".png")){
                 newJob.setCaptcha_src("null");
+                log.error("图片保存失败！");
             } else {
+                log.info("图片已成功保存！");
                 // 4.将保存的图片进行分类
                 newJob.setCaptcha_src(globalVariable.getPhotoSave_path() + tempJobId + ".png");
                 classMessage = classifyService.classify(params.getString("src_type"),
                         globalVariable.getPhotoSave_path() + tempJobId + ".png");
+                log.info("图片分类成功！类别为："+classMessage);
                 newJob.setSubtype_id(classMessage);
             }
 
+            log.info("验证码的分类结果为："+classMessage);
+
             // 5.发送到消息队列中
             JobMessage jobMessage = new JobMessage(tempJobId, params.getString("src_type"), params.getString("data"), classMessage);
+            jobMessage.setPath(globalVariable.getPhotoSave_path()+tempJobId+".png");
             if (!producer01.produce(jobMessage)){
                 message += "消息队列出错!";
+                log.info("消息入队出错！！！");
             } else {
+                log.info("消息入队成功！！！");
                 int contrl1 = 0, control2 = 0;
                 // 6.是否接受任务
                 List<User> list = null;
                 while (ObjectUtils.isEmpty(list)&&contrl1<globalVariable.getAvailuser_timeout()){
                     list = globalMap.getJobidReceiver(tempJobId);
+                    log.info(tempJobId+"   "+globalMap.jobReceiver.size());
+                    log.info("获取接收者中......");
                     contrl1++;
                     Thread.sleep(1000);
                 }
@@ -97,17 +110,23 @@ public class RecognitionController {
                 if (ObjectUtils.isEmpty(list)){
                     message += "短期内没有空闲打码客户端";
                 } else {
+                    log.info("接收者的列表大小为：" + list.size());
+                    log.info("任务已被接受！");
                     client = "";
                     newJob.setReceive_time(new Timestamp(System.currentTimeMillis()));
                     for (User user : list){
-                        newJob.setRequester_id(newJob.getReceiver_id()+user.getUser_id()+",");
+                        newJob.setRequester_id(user.getUser_id()+"");
                         client += user.getUser_name() + " ";
                     }
                     // 7.开始等待任务的结果
-                    List<String> tempRes = null;
+                    List<String> tempRes = new ArrayList<>();
 
-                    while (tempRes.size()!=list.size()&&control2<globalVariable.getTask_timeout()){
+                    log.info("jieguoduixiangshifouweikong:"+ObjectUtils.isEmpty(tempRes)+" "+tempRes.size());
+
+                    while (tempRes.size()<list.size()&&control2<globalVariable.getTask_timeout()){
                         tempRes = getJobResService.getRes(tempJobId);
+
+                        log.info("获取打码结果中...");
                         control2++;
                         Thread.sleep(1000);
                     }
@@ -115,12 +134,14 @@ public class RecognitionController {
                     if (ObjectUtils.isEmpty(tempRes)){
                         message += "打码端超时！";
                     } else {
+                        log.info("任务结果返回成功！");
                         // 8.结果投票
                         bypass_result = voteService.voteResult(tempRes);
                         newJob.setFinish_time(new Timestamp(System.currentTimeMillis()));
                         newJob.setCaptcha_result(bypass_result);
 
                         if (!Util.hasElement(globalVariable.getBypass_failed_result_list(), bypass_result)){
+
                             status = "200";
                             message = "识别成功";
                         }
@@ -134,7 +155,9 @@ public class RecognitionController {
             newJob.setJob_id(null);
             jobMapper.addJob(newJob);
             job_id = newJob.getJob_id();
+            log.info("job表插入成功！");
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("job表插入出错！");
         }
         res.put("status", status);
@@ -143,6 +166,7 @@ public class RecognitionController {
         res.put("bypass_result", bypass_result);
         res.put("client", client);
         res.put("job_id", job_id);
-        return new JSONObject();
+        log.info("fanhuidejieguowei:"+res.toString());
+        return res;
     }
 }

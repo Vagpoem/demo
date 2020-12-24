@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.entity.User;
 import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
+import com.example.demo.controller.listener.WebSocketServer;
 import com.example.demo.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,10 @@ public class LogoutService {
             String sessionid = session.getId();
             User user = (User) session.getAttribute("user");
             log.info("退出的用户为："+user);
+
+            if (!ObjectUtils.isEmpty(WebSocketServer.getWebSocket(user_id))){
+                WebSocketServer.getWebSocket(user_id).onClose();
+            }
 
             if (ObjectUtils.isEmpty(user)){
                 log.info("已退出！");
