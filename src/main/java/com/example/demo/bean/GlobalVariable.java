@@ -20,6 +20,10 @@ public class GlobalVariable {
     @Value("#{'${request.appoint.srctype}'.split(',')}")
     private List<String> appoint_src_type_list;
 
+    // 可保存类型
+    @Value("#{'${request.saveable}'.split(',')}")
+    private List<String> saveable_list;
+
     // 验证码类型的列表
     @Value("#{'${captcha.type}'.split(',')}")
     private List<String> captcha_type_list;
@@ -90,6 +94,18 @@ public class GlobalVariable {
     // session存活时间配置
     @Value("${session.age}")
     private int session_age;
+
+    // 打码失败的结果
+    @Value("#{'${bypass.failed.result}'.split(',')}")
+    private List<String> bypass_failed_result_list;
+
+    public List<String> getBypass_failed_result_list() {
+        return bypass_failed_result_list;
+    }
+
+    public List<String> getSaveable_list() {
+        return saveable_list;
+    }
 
     public List<String> getAi_captcha_id_list() {
         return ai_captcha_id_list;

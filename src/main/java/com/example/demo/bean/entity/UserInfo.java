@@ -1,8 +1,11 @@
 package com.example.demo.bean.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserInfo {
 
-    private String userid;
+    private String id;
     // 用户的准确率
     private int accuracy;
     // 用户的平均速度
@@ -10,14 +13,31 @@ public class UserInfo {
     // 用户的
     private int accu_score;
     private int exception_rate;
-    private int fatigue;
+
+    public UserInfo(String id, int accuracy, int speed, int accu_score, int exception_rate) {
+        this.id = id;
+        this.accuracy = accuracy;
+        this.speed = speed;
+        this.accu_score = accu_score;
+        this.exception_rate = exception_rate;
+    }
+
+    public Map<String, Object> remap(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", this.id);
+        map.put("accuracy", this.accuracy);
+        map.put("speed", this.speed);
+        map.put("accu_score", this.accu_score);
+        map.put("exception_rate", this.exception_rate);
+        return map;
+    }
 
     public String getUserid() {
-        return userid;
+        return id;
     }
 
     public void setUserid(String userid) {
-        this.userid = userid;
+        this.id = userid;
     }
 
     public int getAccuracy() {
@@ -50,13 +70,5 @@ public class UserInfo {
 
     public void setException_rate(int exception_rate) {
         this.exception_rate = exception_rate;
-    }
-
-    public int getFatigue() {
-        return fatigue;
-    }
-
-    public void setFatigue(int fatigue) {
-        this.fatigue = fatigue;
     }
 }

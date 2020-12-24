@@ -91,7 +91,7 @@ public class WebSocketServer {
     public void onMessage(String message, Session session){
 
         // 1.将结果保存
-        globalMap.setJobidResult(jobId, message);
+        globalMap.setJobidResult(jobId, message.trim());
 
         // 2.将用户加入到空闲用户列表中
         avaiUserListService.addUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"));

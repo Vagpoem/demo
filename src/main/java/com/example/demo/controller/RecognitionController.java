@@ -12,6 +12,7 @@ import com.example.demo.bean.entity.JobMessage;
 import com.example.demo.bean.entity.User;
 import com.example.demo.mapper.JobMapper;
 import com.example.demo.service.*;
+import com.example.demo.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,28 +53,32 @@ public class RecognitionController {
 
         JSONObject res = new JSONObject();
         String classMessage = "未知", status = "500", message = "识别失败！",
-                bypass_result = "识别失败", client = "-1", job_id = "-1";
+                bypass_result = "识别失败", client = "-1", job_id = "-1", temp = "";
+        Job newJob = null;
 
         // 1.进行身份和数据合法性的验证
         if (!verificationService.verify(params, token)){
             message += "非法请求者或非法请求数据！";
         } else {
             // 2.生成局部Job数据对象（并先为其设置请求者id、请求时间以及任务状态 “0”代表还未开始）
-            Job newJob = new Job();
+            newJob = new Job();
             String tempJobId = UUID.randomUUID().toString();
             newJob.setRequester_id(params.getString("user_id"));
             newJob.setReceive_time(new Timestamp(System.currentTimeMillis()));
             newJob.setJob_status("0");
+            newJob.setJob_name(" ");
 
             // 3.将传入的验证码数据保存为图片
             // TODO:数据保存出错不需要处理？继续打码任务？
-            if (!imgSaveService.save(params, globalVariable.getPhotoSave_path())){
-                message += "数据保存出错!";
+            if (!imgSaveService.save(params, globalVariable.getPhotoSave_path() + temp + ".png")){
+                newJob.setCaptcha_src("null");
+            } else {
+                // 4.将保存的图片进行分类
+                newJob.setCaptcha_src(globalVariable.getPhotoSave_path() + temp + ".png");
+                classMessage = classifyService.classify(params.getString("src_type"),
+                        globalVariable.getPhotoSave_path() + temp + ".png");
+                newJob.setSubtype_id(classMessage);
             }
-
-            // 4.将保存的图片进行分类
-            classMessage = classifyService.classify(globalVariable.getPhotoSave_path());
-            newJob.setSubtype_id(classMessage);
 
             // 5.发送到消息队列中
             JobMessage jobMessage = new JobMessage(tempJobId, params.getString("src_type"), params.getString("data"), classMessage);
@@ -92,7 +97,12 @@ public class RecognitionController {
                 if (ObjectUtils.isEmpty(list)){
                     message += "短期内没有空闲打码客户端";
                 } else {
+                    client = "";
                     newJob.setReceive_time(new Timestamp(System.currentTimeMillis()));
+                    for (User user : list){
+                        newJob.setRequester_id(newJob.getReceiver_id()+user.getUser_id()+",");
+                        client += user.getUser_name() + " ";
+                    }
                     // 7.开始等待任务的结果
                     List<String> tempRes = null;
 
@@ -107,10 +117,25 @@ public class RecognitionController {
                     } else {
                         // 8.结果投票
                         bypass_result = voteService.voteResult(tempRes);
+                        newJob.setFinish_time(new Timestamp(System.currentTimeMillis()));
+                        newJob.setCaptcha_result(bypass_result);
+
+                        if (!Util.hasElement(globalVariable.getBypass_failed_result_list(), bypass_result)){
+                            status = "200";
+                            message = "识别成功";
+                        }
                     }
                 }
                 // TODO:9.换人分发？
             }
+        }
+
+        try {
+            newJob.setJob_id(null);
+            jobMapper.addJob(newJob);
+            job_id = newJob.getJob_id();
+        } catch (Exception e) {
+            log.error("job表插入出错！");
         }
         res.put("status", status);
         res.put("message", message);
