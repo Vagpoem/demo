@@ -95,9 +95,17 @@ public class GlobalVariable {
     @Value("${session.age}")
     private int session_age;
 
+    // topsis访问restAPI
+    @Value("${topsis.url}")
+    private String topsis_url;
+
     // 打码失败的结果
     @Value("#{'${bypass.failed.result}'.split(',')}")
     private List<String> bypass_failed_result_list;
+
+    public String getTopsis_url() {
+        return topsis_url;
+    }
 
     public List<String> getBypass_failed_result_list() {
         return bypass_failed_result_list;
