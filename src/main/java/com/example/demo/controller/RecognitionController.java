@@ -70,13 +70,13 @@ public class RecognitionController {
 
             // 3.将传入的验证码数据保存为图片
             // TODO:数据保存出错不需要处理？继续打码任务？
-            if (!imgSaveService.save(params, globalVariable.getPhotoSave_path() + temp + ".png")){
+            if (!imgSaveService.save(params, globalVariable.getPhotoSave_path() + tempJobId + ".png")){
                 newJob.setCaptcha_src("null");
             } else {
                 // 4.将保存的图片进行分类
-                newJob.setCaptcha_src(globalVariable.getPhotoSave_path() + temp + ".png");
+                newJob.setCaptcha_src(globalVariable.getPhotoSave_path() + tempJobId + ".png");
                 classMessage = classifyService.classify(params.getString("src_type"),
-                        globalVariable.getPhotoSave_path() + temp + ".png");
+                        globalVariable.getPhotoSave_path() + tempJobId + ".png");
                 newJob.setSubtype_id(classMessage);
             }
 
