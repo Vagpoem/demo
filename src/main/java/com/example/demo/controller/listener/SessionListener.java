@@ -2,6 +2,7 @@ package com.example.demo.controller.listener;
 
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.SpringJobBeanFactory;
@@ -66,7 +67,11 @@ public class SessionListener implements HttpSessionListener, HttpSessionAttribut
         if (!ObjectUtils.isEmpty(WebSocketServer.getWebSocket(user.getUser_id()+""))){
             log.info("已断开websocket连接！");
 //            try {
-//                WebSocketServer.getWebSocket(user.getUser_id()+"").sendMessage("duankailianjie?");
+//                JSONObject msg = new JSONObject();
+//                msg.put("src_type", "30");
+//                msg.put("show_data", "断开连接？");
+//                msg.put("cate_code", "12");
+//                WebSocketServer.sendInfo(msg, user.getUser_id()+"", "5324543523425");
 //            } catch (IOException e) {
 //                e.printStackTrace();
 //            }

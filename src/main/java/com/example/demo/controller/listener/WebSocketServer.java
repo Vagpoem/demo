@@ -48,7 +48,12 @@ public class WebSocketServer {
     @OnOpen
     public void onOpen(Session session, @PathParam("userId") String userId){
 
-        // 1.将websocket加入到集合中
+        // 1.先查看是否为登录状态再进行连接
+        if (ObjectUtils.isEmpty(globalMap.getSessionFromUserid(userId))){
+            return;
+        }
+
+        // 2.将websocket加入到集合中
         this.session = session;
         this.userId = userId;
         if (webSocketMap.containsKey(userId)){
@@ -60,10 +65,10 @@ public class WebSocketServer {
             addOnlineCount();
         }
 
-        // 2.将用户加入到空闲用户列表中
+        // 3.将用户加入到空闲用户列表中
         avaiUserListService.addUser((User) globalMap.getSessionFromUserid(userId).getAttribute("user"));
 
-        // 3.登录状态会话状态维护
+        // 4.登录状态会话状态维护
         globalMap.getSessionFromUserid(userId).setMaxInactiveInterval(globalVariable.getSession_age());
 
         log.info("用户连接:"+userId+",当前在线人数为:" + getOnlineCount());
