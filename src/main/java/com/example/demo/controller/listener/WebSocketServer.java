@@ -50,6 +50,7 @@ public class WebSocketServer {
 
         // 1.先查看是否为登录状态再进行连接
         if (ObjectUtils.isEmpty(globalMap.getSessionFromUserid(userId))){
+            log.info("无法打开websocket！！！");
             return;
         }
 
