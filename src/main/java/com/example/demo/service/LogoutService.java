@@ -46,7 +46,9 @@ public class LogoutService {
             User user = (User) session.getAttribute("user");
             log.info("退出的用户为："+user);
 
+            // 3.先断开websocket连接再销毁session对话
             if (!ObjectUtils.isEmpty(WebSocketServer.getWebSocket(user_id))){
+                log.info("已断开websocket连接！");
                 WebSocketServer.getWebSocket(user_id).onClose();
             }
 
@@ -55,7 +57,7 @@ public class LogoutService {
                 status = "200";
                 message = "用户已退出，请勿重复退出！";
             } else {
-                // 3.删除全局映射中的映射信息
+                // 4.删除全局映射中的映射信息
                 globalMap.delSessionFromUserid(user_id);
                 globalMap.delSessionFromUsername(user.getUser_name());
                 log.info("注销用户的登录信息！");

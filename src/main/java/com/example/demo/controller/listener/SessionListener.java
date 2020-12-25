@@ -13,6 +13,7 @@ import org.springframework.util.ObjectUtils;
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.*;
+import java.io.IOException;
 import java.util.HashSet;
 
 @WebListener
@@ -60,8 +61,19 @@ public class SessionListener implements HttpSessionListener, HttpSessionAttribut
         log.warn("-----sessionDestroyed-----");
         HttpSession session = event.getSession();
 
-        // 2.消除session和用户信息之间的映射
         User user = (User) session.getAttribute("user");
+        // 2.先销毁websocket连接
+        if (!ObjectUtils.isEmpty(WebSocketServer.getWebSocket(user.getUser_id()+""))){
+            log.info("已断开websocket连接！");
+//            try {
+//                WebSocketServer.getWebSocket(user.getUser_id()+"").sendMessage("duankailianjie?");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+            WebSocketServer.getWebSocket(user.getUser_id()+"").onClose();
+        }
+
+        // 3.消除session和用户信息之间的映射
         session.removeAttribute("user");
         log.info("被删除session的用户信息为："+user);
         GlobalMap globalMap = SpringJobBeanFactory.getBean("globalMap");
@@ -69,7 +81,7 @@ public class SessionListener implements HttpSessionListener, HttpSessionAttribut
         globalMap.delSessionFromUserid(user.getUser_id()+"");
         globalMap.delSessionFromUsername(user.getUser_name());
 
-        // 3.销毁会话对象映射
+        // 4.销毁会话对象映射
         ServletContext application = session.getServletContext();
         HashSet<?> sessions = (HashSet<?>) application.getAttribute("sessions");
         // 4.销毁的session均从HashSet集中移除
