@@ -66,6 +66,7 @@ public class LogoutService {
                 Util.addCookie("sessionid", sessionid, response, 0);
                 Util.addCookie("user_name", user.getUser_name(), response, 0);
                 Util.addCookie("user_id", user.getUser_id()+"", response, 0);
+                Util.addCookie("token", user.getToken(), response, 0);
                 log.info("消除cookie的信息！");
 
                 // 5.将session进行销毁

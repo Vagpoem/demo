@@ -72,6 +72,7 @@ public class LoginService {
                         Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
                         Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
                         Util.addCookie("user_id", user.getUser_id()+"", response, globalVariable.getCookie_age());
+                        Util.addCookie("token", user.getToken(), response, globalVariable.getCookie_age());
                         log.info("cookie信息设置完毕......");
                         globalMap.setUsernameSession(user.getUser_name(), session);
                         globalMap.setUseridSession(judgeUser.getUser_id()+"", session);
