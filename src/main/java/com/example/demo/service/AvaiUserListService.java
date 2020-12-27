@@ -3,6 +3,7 @@ package com.example.demo.service;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.example.demo.bean.entity.User;
+import com.example.demo.bean.entity.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,10 @@ public class AvaiUserListService {
 
     // 空闲用户列表
     private Set<User> availUserList = new HashSet<>();
+    // 空闲用户列表中的传入topsis算法中的信息
+    private Set<UserInfo> availUserInfoList = new HashSet<>();
     // 向空闲用户列表中加入空闲用户
-    public synchronized boolean addUser(User user){
+    public synchronized boolean addUser(User user, UserInfo userInfo){
         boolean flag = false;
         if (!availUserList.contains(user)){
             availUserList.add(user);
@@ -26,7 +29,7 @@ public class AvaiUserListService {
         return flag;
     }
     // 从空闲用户列表中删除用户
-    public synchronized boolean delUser(User user){
+    public synchronized boolean delUser(User user, UserInfo userInfo){
         boolean flag = false;
         if (availUserList.contains(user)){
             flag = availUserList.remove(user);

@@ -123,7 +123,7 @@ public class RecognitionController {
 
                     log.info("jieguoduixiangshifouweikong:"+ObjectUtils.isEmpty(tempRes)+" "+tempRes.size());
 
-                    while (tempRes.size()<list.size()&&control2<globalVariable.getTask_timeout()){
+                    while (ObjectUtils.isEmpty(tempRes)&&control2<globalVariable.getTask_timeout()){
                         tempRes = getJobResService.getRes(tempJobId);
 
                         log.info("获取打码结果中...");

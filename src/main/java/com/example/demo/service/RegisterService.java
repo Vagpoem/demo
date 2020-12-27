@@ -4,6 +4,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.entity.User;
+import com.example.demo.bean.entity.UserInfo;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
@@ -87,6 +88,8 @@ public class RegisterService {
                 session.setMaxInactiveInterval(globalVariable.getSession_age());
                 String sessionid = session.getId();
                 session.setAttribute("user", user);
+                UserInfo userInfo = new UserInfo();
+                session.setAttribute("userinfo", userInfo);
                 Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
                 Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());
                 Util.addCookie("user_id", user.getUser_id()+"", response, globalVariable.getCookie_age());

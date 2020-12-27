@@ -14,6 +14,8 @@ public class UserInfo {
     private int accu_score;
     private int exception_rate;
 
+    public UserInfo(){}
+
     public UserInfo(String id, int accuracy, int speed, int accu_score, int exception_rate) {
         this.id = id;
         this.accuracy = accuracy;

@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.entity.User;
+import com.example.demo.bean.entity.UserInfo;
 import com.example.demo.service.AvaiUserListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -67,7 +68,8 @@ public class WebSocketServer {
         }
 
         // 3.将用户加入到空闲用户列表中
-        avaiUserListService.addUser((User) globalMap.getSessionFromUserid(userId).getAttribute("user"));
+        avaiUserListService.addUser((User) globalMap.getSessionFromUserid(userId).getAttribute("user"),
+                (UserInfo) globalMap.getSessionFromUserid(userId).getAttribute("userinfo"));
 
         // 4.登录状态会话状态维护
         globalMap.getSessionFromUserid(userId).setMaxInactiveInterval(globalVariable.getSession_age());
@@ -83,7 +85,8 @@ public class WebSocketServer {
             webSocketMap.remove(userId);
 
             // 2.将用户从空闲用户列表中删除
-            avaiUserListService.delUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"));
+            avaiUserListService.delUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"),
+                    (UserInfo) globalMap.getSessionFromUserid(userId).getAttribute("userinfo"));
 
             // 3.登录状态会话状态维护
             globalMap.getSessionFromUserid(userId).setMaxInactiveInterval(globalVariable.getSession_age());
@@ -100,7 +103,8 @@ public class WebSocketServer {
         globalMap.setJobidResult(jobId, message.trim());
 
         // 2.将用户加入到空闲用户列表中
-        avaiUserListService.addUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"));
+        avaiUserListService.addUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"),
+                (UserInfo) globalMap.getSessionFromUserid(userId).getAttribute("userinfo"));
 
         // 3.将本对象的jobId置为空
         setJobId("");
