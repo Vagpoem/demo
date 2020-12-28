@@ -146,6 +146,9 @@ public class RecognitionController {
                             message = "识别成功";
                         }
                     }
+
+                    globalMap.delJobidReceiver(tempJobId);
+                    globalMap.delJobidResult(tempJobId);
                 }
                 // TODO:9.换人分发？
             }
@@ -160,6 +163,8 @@ public class RecognitionController {
             e.printStackTrace();
             log.error("job表插入出错！");
         }
+
+
         res.put("status", status);
         res.put("message", message);
         res.put("class", classMessage);

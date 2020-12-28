@@ -3,7 +3,9 @@ package com.example.demo.bean;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.example.demo.bean.entity.JobMessage;
+import com.example.demo.service.AppointPushService;
 import com.example.demo.service.ThreadService;
+import com.example.demo.util.Util;
 import com.google.gson.Gson;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -25,6 +27,10 @@ public class Consumer01 {
     private ThreadService threadService;
     @Autowired
     GlobalMap globalMap;
+    @Autowired
+    GlobalVariable globalVariable;
+    @Autowired
+    AppointPushService appointPushService;
 
     /**
      * 消费者消费消息的方法
@@ -44,7 +50,11 @@ public class Consumer01 {
 
         // 3.利用多线程的服务进行任务调度
         try {
-            threadService.schedule(jobMessage);
+            if (Util.hasElement(globalVariable.getAuto_src_type_list(), jobMessage.getType())) {
+                threadService.schedule(jobMessage);
+            } else if (Util.hasElement(globalVariable.getAppoint_src_type_list(), jobMessage.getType())) {
+                appointPushService.appointPush(jobMessage);
+            }
         } catch (Exception e) {
             // 如果出错往任务结果返回区内返回出错信息
             log.error("新开线程出错！");
