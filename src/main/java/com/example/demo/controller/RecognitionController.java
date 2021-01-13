@@ -141,11 +141,13 @@ public class RecognitionController {
                         newJob.setCaptcha_result(bypass_result);
 
                         if (!Util.hasElement(globalVariable.getBypass_failed_result_list(), bypass_result)){
-
                             status = "200";
                             message = "识别成功";
                         }
                     }
+
+                    globalMap.delJobidReceiver(tempJobId);
+                    globalMap.delJobidResult(tempJobId);
                 }
                 // TODO:9.换人分发？
             }
@@ -160,9 +162,16 @@ public class RecognitionController {
             e.printStackTrace();
             log.error("job表插入出错！");
         }
+
+
         res.put("status", status);
         res.put("message", message);
         res.put("class", classMessage);
+        for (int i = 0;i<globalVariable.getCaptcha_type_list().size();i++){
+            if (bypass_result.equals(globalVariable.getCaptcha_type_list().get(i))){
+                bypass_result = globalVariable.getCaptcha_type_desc_list().get(i);
+            }
+        }
         res.put("bypass_result", bypass_result);
         res.put("client", client);
         res.put("job_id", job_id);
