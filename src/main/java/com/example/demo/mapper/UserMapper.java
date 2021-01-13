@@ -13,7 +13,7 @@ public interface UserMapper {
      * @param user 新用户的的user对象数据
      * @return 插入是否成功
      */
-    @Insert("insert into user values(#{user_id},#{user_name},#{password},#{role},#{mail},#{status},#{token},#{mark},#{phone},#{hasPhone})")
+    @Insert("insert into user values(#{user_id},#{user_name},#{password},#{mail},#{role},#{status},#{token},#{mark},#{phone},#{hasPhone})")
     @Options(useGeneratedKeys = true, keyProperty = "user_id")
     public int addUser(User user);
 
