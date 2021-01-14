@@ -19,6 +19,7 @@ public class DistributeService {
         if (Util.hasElement(globalVariable.getAi_captcha_type_list(), type)){
             res = "ai";
         }
+        System.out.println(res);
         return res;
     }
 }

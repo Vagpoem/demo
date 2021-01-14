@@ -37,6 +37,7 @@ public class ThreadService {
 
         // 1.先确定分发的模式
         String AiOrPerson = distributeService.distribute(jobMessage.getJobType());
+        System.out.println("schedule"+AiOrPerson);
 
         log.info("确定了任务分发的类型为："+ AiOrPerson);
 

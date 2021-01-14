@@ -47,11 +47,13 @@ public class Consumer01 {
         // 2.将序列化的字符串转化为所需要的对象
         JobMessage jobMessage = new Gson().fromJson(strMsg, JobMessage.class);
         log.info("消息"+jobMessage.getJob_id()+"出队");
+        System.out.println("xiaoxidetypewei:"+jobMessage.getJobType());
 
         // 3.利用多线程的服务进行任务调度
         try {
             if (Util.hasElement(globalVariable.getAuto_src_type_list(), jobMessage.getType())) {
                 threadService.schedule(jobMessage);
+                System.out.println("任务调度成功");
             } else if (Util.hasElement(globalVariable.getAppoint_src_type_list(), jobMessage.getType())) {
                 appointPushService.appointPush(jobMessage);
             }
