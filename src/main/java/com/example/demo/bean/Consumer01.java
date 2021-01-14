@@ -51,16 +51,20 @@ public class Consumer01 {
 
         // 3.利用多线程的服务进行任务调度
         try {
+            // 判断任务是自动分配还是指定分配类型
             if (Util.hasElement(globalVariable.getAuto_src_type_list(), jobMessage.getType())) {
+                // 自动分配类型
                 threadService.schedule(jobMessage);
-                System.out.println("任务调度成功");
+                log.info("任务自动分配成功。。。");
             } else if (Util.hasElement(globalVariable.getAppoint_src_type_list(), jobMessage.getType())) {
+                // 指定分配类型
                 appointPushService.appointPush(jobMessage);
+                log.info("任务指定分配成功。。。");
             }
         } catch (Exception e) {
-            // 如果出错往任务结果返回区内返回出错信息
-            log.error("新开线程出错！");
-            globalMap.setJobidResult(jobMessage.getJob_id(), "系统出错");
+            // 如果任务调度出错，在识别接口处就不会获取到接受人物的客户端信息
+            e.printStackTrace();
+            log.error("任务调度出错！");
         }
 
     }

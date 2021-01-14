@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.bean.GlobalMap;
+import com.example.demo.bean.entity.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -14,8 +15,8 @@ public class GetJobResService {
     @Autowired
     GlobalMap globalMap;
 
-    public List<String> getRes(String id){
-        List<String> res = null;
+    public List<Result> getRes(String id){
+        List<Result> res = null;
 
         if (!ObjectUtils.isEmpty(id))
         {

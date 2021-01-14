@@ -5,6 +5,7 @@ import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
+import com.example.demo.bean.entity.Result;
 import com.example.demo.bean.entity.User;
 import com.example.demo.bean.entity.UserInfo;
 import com.example.demo.service.AvaiUserListService;
@@ -100,7 +101,8 @@ public class WebSocketServer {
     public void onMessage(String message, Session session){
 
         // 1.将结果保存
-        globalMap.setJobidResult(jobId, message.trim());
+        Result tempResult = new Result(this.userId, message.trim());
+        globalMap.setJobidResult(jobId, tempResult);
 
         // 2.将用户加入到空闲用户列表中
         avaiUserListService.addUser((User)globalMap.getSessionFromUserid(userId).getAttribute("user"),

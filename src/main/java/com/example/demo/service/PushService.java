@@ -6,8 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.GlobalMap;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.HttpRequest;
-import com.example.demo.bean.entity.BypassUser;
 import com.example.demo.bean.entity.JobMessage;
+import com.example.demo.bean.entity.Result;
 import com.example.demo.bean.entity.User;
 import com.example.demo.controller.listener.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,15 +67,15 @@ public class PushService {
                 // 3.返回结果
                 if (!ObjectUtils.isEmpty(isAI)){
                     if (isAI.getString("status").equals("200")){
-                        //log.info("AI识别的结果为："+isAI.getString("value"));
-                        globalMap.setJobidResult(jobMessage.getJob_id(), isAI.getString("value"));
+                        Result tempResult = new Result(user.getUser_id()+"", isAI.getString("value"));
+                        globalMap.setJobidResult(jobMessage.getJob_id(), tempResult);
                         log.info(jobMessage.getJob_id()+"   AI识别的结果为："+isAI.getString("value"));
                         log.info("任务结果和id映射完成："+globalMap.jobResult.size());
                     }else {
-                        globalMap.setJobidResult(jobMessage.getJob_id(), "系统出错");
+                        globalMap.setJobidResult(jobMessage.getJob_id(), new Result(user.getUser_id()+"", "系统出错"));
                     }
                 }else {
-                    globalMap.setJobidResult(jobMessage.getJob_id(), "系统出错");
+                    globalMap.setJobidResult(jobMessage.getJob_id(), new Result(user.getUser_id()+"", "系统出错"));
                 }
 
                 res = true;

@@ -2,6 +2,7 @@ package com.example.demo.bean;
 
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import com.example.demo.bean.entity.Result;
 import com.example.demo.bean.entity.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -74,16 +75,16 @@ public class GlobalMap {
 
 
     // 任务id和任务结果的映射表
-    public Map<String, List<String>> jobResult = new HashMap<>();
+    public Map<String, List<Result>> jobResult = new HashMap<>();
     // 向任务id和结果的映射表中添加元素
-    public boolean setJobidResult(String job_id, String result){
+    public boolean setJobidResult(String job_id, Result result){
         boolean flag = false;
         if (jobResult.containsKey(job_id)){
-            List<String> list = jobResult.get(job_id);
+            List<Result> list = jobResult.get(job_id);
             list.add(result);
             flag = true;
         } else {
-            List<String> list = new ArrayList<>();
+            List<Result> list = new ArrayList<>();
             list.add(result);
             jobResult.put(job_id, list);
             flag = true;
@@ -91,8 +92,8 @@ public class GlobalMap {
         return flag;
     }
     // 从任务id和结果的映射表中获取元素
-    public List<String> getJobidResult(String job_id){
-        List<String > list = null;
+    public List<Result> getJobidResult(String job_id){
+        List<Result> list = null;
         if (jobResult.containsKey(job_id)){
             list = jobResult.get(job_id);
         }

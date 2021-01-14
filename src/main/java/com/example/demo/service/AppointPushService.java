@@ -58,7 +58,7 @@ public class AppointPushService {
                 res = true;
             } catch (IOException e) {
                 e.printStackTrace();
-                globalMap.setJobidResult(jobMessage.getJob_id(), "系统出错");
+//                globalMap.setJobidResult(jobMessage.getJob_id(), "系统出错");
             }
         }
 

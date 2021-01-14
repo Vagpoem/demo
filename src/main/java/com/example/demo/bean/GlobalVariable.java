@@ -49,7 +49,7 @@ public class GlobalVariable {
     private List<String> captcha_single_push_list;
 
     // 多人推送的验证码类型列表
-    @Value("#{'${captcha.single.push}'.split(',')}")
+    @Value("#{'${captcha.multi.push}'.split(',')}")
     private List<String> captcha_multi_push_list;
 
     // 任务超时时间设置
@@ -59,6 +59,10 @@ public class GlobalVariable {
     // 空闲用户获取时间设置
     @Value("${availuser.timeout}")
     private int availuser_timeout;
+
+    // 多人分发的分发人数
+    @Value("${captcha.multi.push.number}")
+    private int captcha_multi_push_number;
 
     // base64编码图片保存地址和url图片保存地址
     @Value("${photoSave.base64}")
@@ -102,6 +106,10 @@ public class GlobalVariable {
     // 打码失败的结果
     @Value("#{'${bypass.failed.result}'.split(',')}")
     private List<String> bypass_failed_result_list;
+
+    public int getCaptcha_multi_push_number() {
+        return captcha_multi_push_number;
+    }
 
     public String getTopsis_url() {
         return topsis_url;
