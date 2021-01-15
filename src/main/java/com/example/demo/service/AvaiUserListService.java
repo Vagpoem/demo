@@ -30,6 +30,7 @@ public class AvaiUserListService {
         boolean flag = false;
         if (!availUserList.contains(user)){
             availUserList.add(user);
+            availUserInfoList.add(userInfo);
             log.info("已向空闲用户列表中加入用户："+user);
         }
         return flag;
@@ -39,6 +40,7 @@ public class AvaiUserListService {
         boolean flag = false;
         if (availUserList.contains(user)){
             flag = availUserList.remove(user);
+            availUserInfoList.remove(userInfo);
             log.info("已从空闲用户列表中删除用户："+user);
         }
         return flag;
@@ -60,6 +62,7 @@ public class AvaiUserListService {
     }
     // 从空闲用户列表中获取多个用户
     public synchronized List<User> getGreatUsers(){
+        List<User> res = null;
         List<User> users = new ArrayList<>();
         if (availUserList.size()>=globalVariable.getCaptcha_multi_push_number()){
             int tempcontrol1 = 0;
@@ -73,7 +76,8 @@ public class AvaiUserListService {
             for (User user : users){
                 availUserList.remove(user);
             }
-        } else {
+            res = users;
+        } else if (availUserList.size()>=1){
             User tempUser = null;
             double max = 0.0;
             for (User user1 : availUserList){
@@ -84,7 +88,10 @@ public class AvaiUserListService {
             }
             availUserList.remove(tempUser);
             users.add(tempUser);
+            res = users;
         }
-        return users;
+        return res;
     }
+
+
 }

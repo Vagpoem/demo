@@ -42,6 +42,23 @@ public interface UserMapper {
     public void mark(@Param("mark") double mark, @Param("user_id") String user_id);
 
     /**
+     * 为被采取的用户加分
+     * @param user_id
+     */
+    @Update("update user set mark=mark+5 where user_id=#{user_id}")
+    public void markAddOne(@Param("user_id") String user_id);
+
+    @Update("update user set mark=mark+3 where user_id=#{user_id}")
+    public void markZeroOne(@Param("user_id") String user_id);
+
+    /**
+     *
+     * @param user_id
+     */
+    @Update("update user set mark=mark-1 where user_id=#{user_id}")
+    public void markSubtractOne(@Param("user_id") String user_id);
+
+    /**
      * 通过手机号码选择用户
      * @param phone 被选择用户的手机号码
      * @return 返回一个用户对象

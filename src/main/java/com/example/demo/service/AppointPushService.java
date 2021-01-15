@@ -39,7 +39,8 @@ public class AppointPushService {
         int control = 0;
         boolean flag = false;
         while (!flag && control<globalVariable.getAvailuser_timeout()){
-            flag = avaiUserListService.delUser((User)globalMap.getSessionFromUserid(id).getAttribute("user"), new UserInfo());
+            flag = avaiUserListService.delUser((User)globalMap.getSessionFromUserid(id).getAttribute("user"),
+                    (UserInfo)globalMap.getSessionFromUserid(id).getAttribute("userinfo"));
             control ++ ;
             try {
                 Thread.sleep(1000);

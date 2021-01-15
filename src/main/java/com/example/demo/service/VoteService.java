@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.entity.Result;
 import com.example.demo.util.Util;
@@ -12,6 +14,8 @@ import java.util.List;
 @Service
 public class VoteService {
 
+    private Log log = LogFactory.get(VoteService.class);
+
     @Autowired
     GlobalVariable globalVariable;
 
@@ -20,7 +24,10 @@ public class VoteService {
 
         if (list.size() == 1){
             res = list.get(0).getResult();
-        } else {
+            if (!Util.hasElement(globalVariable.getBypass_failed_result_list(), list.get(0).getResult())){
+                list.get(0).setFlag(1);
+            }
+        } else if (list.size() > 1){
             if (jobType.equals("6")){
                 res = angleVote(list);
             } else if (jobType.equals("5")){
@@ -58,6 +65,8 @@ public class VoteService {
                     }
                 }
             }
+            temp.get(index1).setFlag(1);
+            temp.get(index2).setFlag(1);
             res = temp.get(index1).getResult();
         }
 
@@ -91,7 +100,9 @@ public class VoteService {
                     }
                 }
             }
-            res = ((Integer.parseInt(temp.get(index1).getResult())+Integer.parseInt(temp.get(index2).getResult()))/2) + "";
+            temp.get(index1).setFlag(1);
+            temp.get(index2).setFlag(1);
+            res = Integer.parseInt(temp.get(index1).getResult()) + "";
         }
 
         return res;
@@ -111,6 +122,8 @@ public class VoteService {
         for (Result result : list){
             if (!Util.hasElement(globalVariable.getBypass_failed_result_list(),result.getResult())){
                 res.add(result);
+            } else {
+                result.setFlag(-1);
             }
         }
         return res;
@@ -144,9 +157,9 @@ public class VoteService {
                         dif[i - 1][j] + 1);
             }
         }
-        System.out.println("字符串\""+str1+"\"与\""+str2+"\"的比较");
+        log.info("字符串\""+str1+"\"与\""+str2+"\"的比较");
         //取数组右下角的值，同样不同位置代表不同字符串的比较
-        System.out.println("差异步骤："+dif[len1][len2]);
+        log.info("差异步骤："+dif[len1][len2]);
         //计算相似度
         float similarity =1 - (float) dif[len1][len2] / Math.max(str1.length(), str2.length());
         return similarity;

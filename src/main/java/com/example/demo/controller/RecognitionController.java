@@ -49,14 +49,20 @@ public class RecognitionController {
     JobMapper jobMapper;
     @Autowired
     GlobalMap globalMap;
+    @Autowired
+    MarkService markService;
+    @Autowired
+    RateService rateService;
 
     @PostMapping("/recognition")
     public JSONObject recognition(@RequestBody JSONObject params, @RequestHeader("token") String token) throws InterruptedException{
 
         JSONObject res = new JSONObject();
         String classMessage = "7", status = "500", message = "识别失败！",
-                bypass_result = "识别失败", client = " ", job_id = "-1", temp = "";
+                bypass_result = "识别失败", client = " ", job_id = "-1", temp = "", accuracy = "0%", timeLoss = "0s", mark = "0分";
         Job newJob = null;
+        List<User> tempUserList = null;
+        List<Result> tempResultList = null;
 
         // 1.进行身份和数据合法性的验证
         if (!verificationService.verify(params, token)){
@@ -65,6 +71,7 @@ public class RecognitionController {
             // 2.生成局部Job数据对象（并先为其设置请求者id、请求时间以及任务状态 “0”代表还未开始）
             newJob = new Job();
             String tempJobId = UUID.randomUUID().toString();
+            temp = tempJobId;
             newJob.setRequester_id(params.getString("user_id"));
             newJob.setReceive_time(new Timestamp(System.currentTimeMillis()));
             newJob.setJob_status("0");
@@ -81,8 +88,14 @@ public class RecognitionController {
                 log.info("图片已成功保存！");
                 // 4.将保存的图片进行分类
                 newJob.setCaptcha_src(globalVariable.getPhotoSave_path() + tempJobId + ".png");
-                classMessage = classifyService.classify(params.getString("src_type"),
-                        globalVariable.getPhotoSave_path() + tempJobId + ".png");
+                if (params.getString("src_type").equals("0")){
+                    classMessage = classifyService.classify(params.getString("src_type"),
+                            globalVariable.getPhotoSave_path() + params.getString("data"));
+                    log.error("图片的数据为："+params.getString("data"));
+                } else {
+                    classMessage = classifyService.classify(params.getString("src_type"),
+                            globalVariable.getPhotoSave_path() + tempJobId + ".png");
+                }
                 log.info("图片分类成功！类别为："+classMessage);
                 newJob.setSubtype_id(classMessage);
             }
@@ -91,7 +104,12 @@ public class RecognitionController {
 
             // 5.发送到消息队列中
             JobMessage jobMessage = new JobMessage(tempJobId, params.getString("src_type"), params.getString("data"), classMessage);
-            jobMessage.setPath(globalVariable.getPhotoSave_path()+tempJobId+".png");
+            if (params.getString("src_type").equals("0")){
+                jobMessage.setPath(globalVariable.getPhotoSave_path() + params.getString("data"));
+                log.info("0类型的路径为："+jobMessage.getPath());
+            } else {
+                jobMessage.setPath(globalVariable.getPhotoSave_path()+tempJobId+".png");
+            }
             if (!producer01.produce(jobMessage)){
                 // 如果发送出错
                 message += "消息队列出错!";
@@ -105,8 +123,6 @@ public class RecognitionController {
                 List<User> list = null;
                 while (ObjectUtils.isEmpty(list)&&contrl1<globalVariable.getAvailuser_timeout()){
                     list = globalMap.getJobidReceiver(tempJobId);
-                    //log.info(tempJobId+"   "+globalMap.jobReceiver.size());
-                    //log.info("获取接收者中......");
                     contrl1++;
                     Thread.sleep(1000);
                 }
@@ -115,6 +131,7 @@ public class RecognitionController {
                 if (ObjectUtils.isEmpty(list)){
                     message += "短期内没有空闲打码客户端";
                 } else {
+                    tempUserList = list;
                     log.info("接收者的列表大小为：" + list.size());
                     log.info("任务已被接受！");
 
@@ -122,7 +139,7 @@ public class RecognitionController {
                     newJob.setReceive_time(new Timestamp(System.currentTimeMillis()));
                     // TODO:为任务设置接受的客户端
                     for (User user : list) {
-                        client += user.getUser_name() + " ";
+                        client += user.getUser_id() + "  ";
                     }
                     client = client.trim();
 
@@ -143,6 +160,7 @@ public class RecognitionController {
                         message += "打码端超时！";
                     } else {
                         log.info("任务结果返回成功！");
+                        tempResultList = tempRes;
                         // 9.结果投票获取最终的打码结果
                         bypass_result = voteService.voteResult(tempRes, classMessage);
                         newJob.setFinish_time(new Timestamp(System.currentTimeMillis()));
@@ -153,10 +171,6 @@ public class RecognitionController {
                             message = "识别成功";
                         }
                     }
-
-                    // 10.将在全局中的任务缓存列表全部删除
-                    globalMap.delJobidReceiver(tempJobId);
-                    globalMap.delJobidResult(tempJobId);
                 }
                 // TODO:换人分发？
             }
@@ -172,6 +186,8 @@ public class RecognitionController {
             e.printStackTrace();
             log.error("job表插入出错！");
         }
+
+
         // 12.对验证码类型进行中文转换
         for (int i = 0;i<globalVariable.getCaptcha_type_list().size();i++){
             if (classMessage.equals(globalVariable.getCaptcha_type_list().get(i))){
@@ -179,14 +195,37 @@ public class RecognitionController {
             }
         }
 
+        try {
+            // 13.更新任务的得分情况
+            markService.updateMark(tempResultList, newJob.getJob_id(), newJob.getReceive_time());
+            for (Result re : tempResultList){
+                if (re.getFlag() == 1){
+                    bypass_result = "采取id为" + re.getUserId() + "的用户的结果:" + re.getResult();
+                    accuracy = rateService.accuracyCalculate(re.getUserId()) + "%";
+                    timeLoss = (int) ((re.getOverTime().getTime() - newJob.getReceive_time().getTime())/1000) + "s";
+                    mark = markService.getMark(re.getUserId())+"分";
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            log.error("任务分数更新失败");
+            e.printStackTrace();
+        }
 
+
+        // 10.将在全局中的任务缓存列表全部删除
+        globalMap.delJobidReceiver(temp);
+        globalMap.delJobidResult(temp);
         res.put("status", status);
         res.put("message", message);
         res.put("class", classMessage);
         res.put("bypass_result", bypass_result);
         res.put("client", client);
         res.put("job_id", job_id);
-        log.info("fanhuidejieguowei:"+res.toString());
+        res.put("curr_acc", accuracy);
+        res.put("speed", timeLoss);
+        res.put("mark", mark);
+        log.info("最终返回的结果为:"+res.toString());
         return res;
     }
 }

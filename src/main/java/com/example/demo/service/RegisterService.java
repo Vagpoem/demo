@@ -33,6 +33,11 @@ public class RegisterService {
     @Autowired
     GlobalMap globalMap;
 
+    @Autowired
+    RateService rateService;
+    @Autowired
+    MarkService markService;
+
     /**
      * 注册方法
      * @param user
@@ -88,7 +93,9 @@ public class RegisterService {
                 session.setMaxInactiveInterval(globalVariable.getSession_age());
                 String sessionid = session.getId();
                 session.setAttribute("user", user);
-                UserInfo userInfo = new UserInfo();
+                String loginId = user.getUser_id()+"";
+                UserInfo userInfo = new UserInfo(loginId, rateService.accuracyCalculate(loginId),
+                        rateService.averageTime(loginId), markService.getMark(loginId), rateService.exceptionRateCalculate(loginId));
                 session.setAttribute("userinfo", userInfo);
                 Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
                 Util.addCookie("user_name", user.getUser_name(), response, globalVariable.getCookie_age());

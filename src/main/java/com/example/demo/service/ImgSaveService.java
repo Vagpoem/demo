@@ -25,6 +25,9 @@ public class ImgSaveService {
     // 用于保存数据的方法
     public boolean save(JSONObject params, String path){
         String src_type = params.getString("src_type");
+        if (src_type.equals("0")){
+            return true;
+        }
 
         switch (src_type) {
             case "1":

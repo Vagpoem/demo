@@ -32,7 +32,7 @@ public class ImgController {
         }
         String originalFileName = upload.getOriginalFilename();//获取原始图片的扩展名
         System.out.println(originalFileName);
-        String newFileName = UUID.randomUUID()+originalFileName;
+        String newFileName = originalFileName;
         System.out.println(newFileName);
         String newFilePath=filePath+originalFileName; //新文件的路径
         System.out.println(newFilePath);
@@ -77,9 +77,10 @@ public class ImgController {
     @GetMapping("/image/{filename}")
     public void getImage(@PathVariable String filename, HttpServletResponse response) {
         System.out.println("开始加载图片...");
+        System.out.println(filename);
         File file = null;
         FileInputStream fis = null;
-        String path = "C:/upload/" + filename + ".png";
+        String path = globalVariable.getPhotoSave_path() + filename + ".png";
 
         try {
             file = new File(path);

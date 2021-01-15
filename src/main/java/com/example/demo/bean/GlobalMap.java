@@ -2,6 +2,7 @@ package com.example.demo.bean;
 
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import com.example.demo.bean.entity.Receive;
 import com.example.demo.bean.entity.Result;
 import com.example.demo.bean.entity.User;
 import org.springframework.stereotype.Component;
@@ -136,6 +137,42 @@ public class GlobalMap {
     public void delJobidReceiver(String job_id){
         if (jobReceiver.containsKey(job_id)){
             jobReceiver.remove(job_id);
+        }
+    }
+
+
+
+    // 任务和接收者的完成情况映射
+    public Map<String, List<Receive>> jobIsSuccess = new HashMap<>();
+    public boolean addJobIsSuccess(String jobId, Receive receive){
+        boolean flag = false;
+        if (jobId.equals("")){
+            return flag;
+        }
+        if (jobIsSuccess.containsKey(jobId)){
+            List<Receive> list = jobIsSuccess.get(jobId);
+            list.add(receive);
+            flag = true;
+        } else {
+            List<Receive> list = new ArrayList<>();
+            list.add(receive);
+            jobIsSuccess.put(jobId, list);
+            flag = true;
+        }
+        return flag;
+    }
+    public List<Receive> getJobIsSuccess(String jobId){
+        List<Receive> res = null;
+        if (!jobId.equals("")){
+            if (jobIsSuccess.containsKey(jobId)){
+                res = jobIsSuccess.get(jobId);
+            }
+        }
+        return res;
+    }
+    public void delJobIsSuccess(String jobId){
+        if (jobIsSuccess.containsKey(jobId)){
+            jobIsSuccess.remove(jobId);
         }
     }
 

@@ -17,6 +17,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ServerEndpoint("/socket/{userId}")
@@ -102,6 +103,7 @@ public class WebSocketServer {
 
         // 1.将结果保存
         Result tempResult = new Result(this.userId, message.trim());
+        tempResult.setOverTime(new Timestamp(System.currentTimeMillis()));
         globalMap.setJobidResult(jobId, tempResult);
 
         // 2.将用户加入到空闲用户列表中

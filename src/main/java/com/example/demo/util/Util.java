@@ -1,9 +1,11 @@
 package com.example.demo.util;
 
+import com.example.demo.bean.entity.Result;
 import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Util {
@@ -67,6 +69,16 @@ public class Util {
                 return true;
         }
         return flag;
+    }
+
+    public static void main(String[] args) {
+        List<Result> list = new ArrayList<>();
+        list.add(new Result("22", "abc"));
+        System.out.println(list.get(0).getFlag());
+        List<Result> temp = new ArrayList<>();
+        temp.add(list.get(0));
+        temp.get(0).setFlag(2);
+        System.out.println(list.get(0).getFlag());
     }
 
 }

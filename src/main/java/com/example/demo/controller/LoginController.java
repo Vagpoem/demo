@@ -36,9 +36,6 @@ public class LoginController {
         // 2.调用登录服务进行登录操作
         JSONObject res = loginService.login(request, response, loginUser);
 
-        Cookie cookie = new Cookie("what","wfsdfds");
-        response.addCookie(cookie);
-
         return res;
     }
 }

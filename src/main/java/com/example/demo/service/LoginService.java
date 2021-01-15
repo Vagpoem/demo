@@ -36,6 +36,11 @@ public class LoginService {
     @Autowired
     LogoutService logoutService;
 
+    @Autowired
+    MarkService markService;
+    @Autowired
+    RateService rateService;
+
     public JSONObject login(HttpServletRequest request, HttpServletResponse response, User user){
 
         log.info("用户："+user.getUser_name()+" 正在尝试登录......");
@@ -74,7 +79,9 @@ public class LoginService {
                             session.setMaxInactiveInterval(globalVariable.getSession_age());
                             String sessionid = session.getId();
                             session.setAttribute("user", judgeUser);
-                            UserInfo userInfo = new UserInfo();
+                            String loginId = judgeUser.getUser_id()+"";
+                            UserInfo userInfo = new UserInfo(loginId, rateService.accuracyCalculate(loginId),
+                                    rateService.averageTime(loginId), markService.getMark(loginId), rateService.exceptionRateCalculate(loginId));
                             session.setAttribute("userinfo", userInfo);
                             log.info("session信息设置完毕......");
                             Util.addCookie("sessionid", sessionid, response, globalVariable.getCookie_age());
