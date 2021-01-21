@@ -124,7 +124,7 @@ public class RecognitionController {
                 while (ObjectUtils.isEmpty(list)&&contrl1<globalVariable.getAvailuser_timeout()){
                     list = globalMap.getJobidReceiver(tempJobId);
                     contrl1++;
-                    Thread.sleep(1000);
+                    Thread.sleep(globalVariable.getAvailUserTimeSlot());
                 }
 
                 // 7.通过判断任务是否被接受来获取任务的结果
@@ -153,7 +153,7 @@ public class RecognitionController {
                         }
                         log.info("获取打码结果中...");
                         control2++;
-                        Thread.sleep(1000);
+                        Thread.sleep(globalVariable.getAvailUserTimeSlot());
                     }
 
                     if (ObjectUtils.isEmpty(tempRes)){
@@ -195,21 +195,23 @@ public class RecognitionController {
             }
         }
 
-        try {
-            // 13.更新任务的得分情况
-            markService.updateMark(tempResultList, newJob.getJob_id(), newJob.getReceive_time());
-            for (Result re : tempResultList){
-                if (re.getFlag() == 1){
-                    bypass_result = "采取id为" + re.getUserId() + "的用户的结果:" + re.getResult();
-                    accuracy = rateService.accuracyCalculate(re.getUserId()) + "%";
-                    timeLoss = (int) ((re.getOverTime().getTime() - newJob.getReceive_time().getTime())/1000) + "s";
-                    mark = markService.getMark(re.getUserId())+"分";
-                    break;
+        if (status.equals("200")){
+            try {
+                // 13.更新任务的得分情况
+                markService.updateMark(tempResultList, newJob.getJob_id(), newJob.getReceive_time());
+                for (Result re : tempResultList){
+                    if (re.getFlag() == 1){
+                        bypass_result = "采取id为" + re.getUserId() + "的用户的结果:" + re.getResult();
+                        accuracy = rateService.accuracyCalculate(re.getUserId()) + "%";
+                        timeLoss = (int) ((re.getOverTime().getTime() - newJob.getReceive_time().getTime())/1000) + "s";
+                        mark = markService.getMark(re.getUserId())+"分";
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                log.error("任务分数更新失败");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            log.error("任务分数更新失败");
-            e.printStackTrace();
         }
 
 

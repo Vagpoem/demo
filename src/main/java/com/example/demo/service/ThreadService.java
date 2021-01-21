@@ -89,7 +89,7 @@ public class ThreadService {
             // 控制循环的次数
             control++;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(globalVariable.getAvailUserTimeSlot());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

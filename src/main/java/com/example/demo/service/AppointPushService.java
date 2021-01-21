@@ -8,11 +8,14 @@ import com.example.demo.bean.GlobalVariable;
 import com.example.demo.bean.entity.JobMessage;
 import com.example.demo.bean.entity.User;
 import com.example.demo.bean.entity.UserInfo;
+import com.example.demo.controller.listener.WebSocketServer;
 import com.example.demo.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,22 +37,27 @@ public class AppointPushService {
     public boolean appointPush(JobMessage jobMessage){
         boolean res = false;
 
-        List<User> availUserList = userMapper.selectHasPhoneUser();
-        String id = availUserList.get(0).getUser_id()+"";
+        List<User> availUserList = new ArrayList<>();
+        List<User> phoneUser = userMapper.selectHasPhoneUser();
+        String id = phoneUser.get(0).getUser_id()+"";
+        log.info("获取到的id为："+id);
         int control = 0;
         boolean flag = false;
         while (!flag && control<globalVariable.getAvailuser_timeout()){
-            flag = avaiUserListService.delUser((User)globalMap.getSessionFromUserid(id).getAttribute("user"),
-                    (UserInfo)globalMap.getSessionFromUserid(id).getAttribute("userinfo"));
+            if (!ObjectUtils.isEmpty(WebSocketServer.getWebSocket(id))){
+                flag = true;
+                log.info("获取到指定的手机用户！"+WebSocketServer.getWebSocket(id).getJobId());
+            }
             control ++ ;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(globalVariable.getAvailUserTimeSlot());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
         if (flag){
+            availUserList.add(phoneUser.get(0));
             try {
                 for (User user : availUserList){
                     globalMap.setJobidReceiver(jobMessage.getJob_id(), user);

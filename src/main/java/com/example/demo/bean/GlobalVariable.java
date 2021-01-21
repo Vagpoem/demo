@@ -64,6 +64,9 @@ public class GlobalVariable {
     @Value("${captcha.multi.push.number}")
     private int captcha_multi_push_number;
 
+    @Value("${availUserTimeSlot}")
+    private int availUserTimeSlot;
+
     // base64编码图片保存地址和url图片保存地址
     @Value("${photoSave.base64}")
     private String photoSave_base64_url;
@@ -106,6 +109,10 @@ public class GlobalVariable {
     // 打码失败的结果
     @Value("#{'${bypass.failed.result}'.split(',')}")
     private List<String> bypass_failed_result_list;
+
+    public int getAvailUserTimeSlot() {
+        return availUserTimeSlot;
+    }
 
     public int getCaptcha_multi_push_number() {
         return captcha_multi_push_number;
